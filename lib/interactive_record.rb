@@ -21,5 +21,6 @@ class InteractiveRecord
   end
   
   def initialize(options={})
+    options.each do |
   
 end
