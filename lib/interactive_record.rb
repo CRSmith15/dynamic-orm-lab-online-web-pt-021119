@@ -22,6 +22,6 @@ class InteractiveRecord
   
   def initialize(options={})
     options.each do |prop, val|
-      
+      self.send
   
 end
