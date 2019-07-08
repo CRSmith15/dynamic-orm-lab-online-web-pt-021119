@@ -19,6 +19,8 @@ class InteractiveRecord
     end
     column_names.compact
   end
+  
+  self.column_names.each do |
 
   def initialize(options={})
     options.each do |property, value|
