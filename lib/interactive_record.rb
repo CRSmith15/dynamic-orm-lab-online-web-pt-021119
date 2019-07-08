@@ -10,7 +10,7 @@ class InteractiveRecord
   def self.column_names
     DB[:conn].results_as_hash = true
 
-    sql = "pragma table_info ('#{table_name}')"
+    sql = "pragma table_info('#{table_name}')"
 
     table_info = DB[:conn].execute(sql)
     column_names = []
@@ -20,29 +20,16 @@ class InteractiveRecord
     column_names.compact
   end
 
-  self.column_names.each do |col_name|
-    attr_accessor col_name.to_sym
-  end
-
-  def initialize(options = {})
+  def initialize(options={})
     options.each do |property, value|
       self.send("#{property}=", value)
     end
   end
 
-  def self.find_by(hash)
-    key, value = hash.first
-    # if value.is_a? String
-    #   value = "'#{value}'"
-    # end
-    # binding.pry
-    sql = "SELECT * FROM #{self.table_name} WHERE #{key.to_s} = ?"
-    DB[:conn].execute(sql, value)
-  end
-
-  def self.find_by_name(name)
-    sql = "SELECT * FROM #{self.table_name} WHERE name = '#{name}'"
+  def save
+    sql = "INSERT INTO #{table_name_for_insert} (#{col_names_for_insert}) VALUES (#{values_for_insert})"
     DB[:conn].execute(sql)
+    @id = DB[:conn].execute("SELECT last_insert_rowid() FROM #{table_name_for_insert}")[0][0]
   end
 
   def table_name_for_insert
@@ -61,10 +48,16 @@ class InteractiveRecord
     self.class.column_names.delete_if {|col| col == "id"}.join(", ")
   end
 
-  def save
-    sql = "INSERT INTO #{table_name_for_insert} (#{col_names_for_insert}) VALUES (#{values_for_insert})"
+  def self.find_by_name(name)
+    sql = "SELECT * FROM #{self.table_name} WHERE name = '#{name}'"
     DB[:conn].execute(sql)
-    @id = DB[:conn].execute("SELECT last_insert_rowid() FROM #{table_name_for_insert}")[0][0]
+  end
+
+  def self.find_by(attribute_hash)
+    value = attribute_hash.values.first
+    formatted_value = value.class == Fixnum || Float ? value : "'#{value}'"
+    sql = "SELECT * FROM #{self.table_name} WHERE #{attribute_hash.keys.first} = #{formatted_value}"
+    DB[:conn].execute(sql)
   end
   
 end
