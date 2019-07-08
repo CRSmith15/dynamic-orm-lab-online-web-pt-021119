@@ -17,7 +17,7 @@ class InteractiveRecord
     table_info.each do |row|
       column_names << row["name"]
     end
-    column_names.compact
+    column_names
   end
 
   def initialize(options={})
@@ -30,7 +30,7 @@ class InteractiveRecord
     sql = "INSERT INTO #{table_name_for_insert} (#{col_names_for_insert}) VALUES (#{values_for_insert})"
     DB[:conn].execute(sql)
     self.id = DB[:conn].execute("SELECT last_insert_rowid() FROM #{table_name_for_insert}")[0][0]
-    
+    save
   end
 
   def table_name_for_insert
