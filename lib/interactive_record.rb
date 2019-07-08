@@ -20,6 +20,6 @@ class InteractiveRecord
     column_names.compact
   end
   
-  def initalize
+  def initialize
   
 end
