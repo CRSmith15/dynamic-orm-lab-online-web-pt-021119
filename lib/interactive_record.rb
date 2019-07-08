@@ -21,7 +21,7 @@ class InteractiveRecord
   end
   
   self.column_names.each do |col_name|
-    self
+    attr_accessor
 
   def initialize(options={})
     options.each do |property, value|
